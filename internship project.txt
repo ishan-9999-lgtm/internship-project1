@@ -1,0 +1,159 @@
+# Combined Temperature Control Web App
+
+---
+## package.json
+```json
+{
+  "name": "temperature-control-web",
+  "version": "1.0.0",
+  "description": "Web app for AI Temperature Control System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  }
+}
+```
+---
+## server.js
+```javascript
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// Serve static frontend files
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Temperature evaluation logic (mirrors Tkinter version)
+function evaluateTemp(temp) {
+  if (temp < 25) return { result: 'Temperature is Normal', fan: 'OFF', ac: 'OFF' };
+  if (temp < 30) return { result: 'Temperature is Slightly High', fan: 'ON (Normal Speed)', ac: 'OFF' };
+  if (temp < 35) return { result: 'Temperature is High', fan: 'ON (High Speed)', ac: 'OFF' };
+  return { result: 'Temperature is Very High', fan: 'OFF', ac: 'ON' };
+}
+
+app.post('/api/check', (req, res) => {
+  const { temperature } = req.body;
+  const tempNum = parseFloat(temperature);
+  if (isNaN(tempNum)) {
+    return res.status(400).json({ error: 'Please provide a numeric temperature.' });
+  }
+  const status = evaluateTemp(tempNum);
+  res.json(status);
+});
+
+// Fallback to index.html for SPA routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+```
+---
+## public/index.html
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Temperature Control System</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>AI Temperature Control System</h1>
+    <input type="number" id="tempInput" placeholder="Enter Temperature (°C)" />
+    <button id="checkBtn">Check Temperature</button>
+    <div class="result" id="result"></div>
+    <div class="status">
+      <p>Fan Status: <span id="fanStatus"></span></p>
+      <p>AC Status: <span id="acStatus"></span></p>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
+```
+---
+## public/styles.css
+```css
+/* Premium dark‑mode with glassmorphism */
+:root {
+  --bg: #0a0a0a;
+  --card-bg: rgba(255, 255, 255, 0.08);
+  --accent: #4a90e2;
+  --text: #e0e0e0;
+  --font: 'Inter', sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  width: 320px;
+}
+
+h1 { font-size: 1.5rem; margin-bottom: 1rem; color: var(--accent); }
+input { width: 100%; padding: 0.5rem; margin-bottom: 1rem; border: none; border-radius: 6px; }
+button { background: var(--accent); color: #fff; border: none; padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer; transition: transform 0.2s; }
+button:hover { transform: scale(1.05); }
+.result { margin-top: 1rem; font-weight: bold; }
+.status p { margin: 0.3rem 0; }
+```
+---
+## public/app.js
+```javascript
+const apiUrl = '/api/check';
+const tempInput = document.getElementById('tempInput');
+const checkBtn = document.getElementById('checkBtn');
+const resultDiv = document.getElementById('result');
+const fanSpan = document.getElementById('fanStatus');
+const acSpan = document.getElementById('acStatus');
+
+checkBtn.addEventListener('click', async () => {
+  const temperature = tempInput.value;
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ temperature })
+    });
+    const data = await response.json();
+    if (data.error) {
+      alert(data.error);
+      return;
+    }
+    resultDiv.textContent = data.result;
+    fanSpan.textContent = data.fan;
+    acSpan.textContent = data.ac;
+  } catch (e) {
+    alert('Failed to contact server.');
+  }
+});
+```
+---

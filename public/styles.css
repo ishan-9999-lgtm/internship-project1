@@ -1,0 +1,36 @@
+/* Premium dark‑mode with glassmorphism */
+:root {
+  --bg: #0a0a0a;
+  --card-bg: rgba(255, 255, 255, 0.08);
+  --accent: #4a90e2;
+  --text: #e0e0e0;
+  --font: 'Inter', sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  width: 320px;
+}
+
+h1 { font-size: 1.5rem; margin-bottom: 1rem; color: var(--accent); }
+input { width: 100%; padding: 0.5rem; margin-bottom: 1rem; border: none; border-radius: 6px; }
+button { background: var(--accent); color: #fff; border: none; padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer; transition: transform 0.2s; }
+button:hover { transform: scale(1.05); }
+.result { margin-top: 1rem; font-weight: bold; }
+.status p { margin: 0.3rem 0; }

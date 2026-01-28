@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Temperature Control System</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <div class="container">
+    <h1>AI Temperature Control System</h1>
+    <input type="number" id="tempInput" placeholder="Enter Temperature (°C)" />
+    <button id="checkBtn">Check Temperature</button>
+    <div class="result" id="result"></div>
+    <div class="status">
+      <p>Fan Status: <span id="fanStatus"></span></p>
+      <p>AC Status: <span id="acStatus"></span></p>
+      <p id="heaterContainer">Heater Status: <span id="heaterStatus"></span><span id="powerStatus"></span></p>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+
+</html>
